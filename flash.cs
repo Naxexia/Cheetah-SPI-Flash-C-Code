@@ -368,19 +368,21 @@ public class flash {
                 break;
             }
         }
+        end = _timeMicroseconds();
+        Console.Write("Totally take {0 :f3} seconds\n", (double)(end - start) / 1000000);
+
         if (!compare_result)
         {
             Console.Write("Flashing Successfull...\n");
             Console.Out.Flush();
+            return 0;
         } else
         {
             Console.Write("Flashing Failed...\n");
             Console.Out.Flush();
+            return -1;
         }
         
-        end = _timeMicroseconds();
-        Console.Write("Totally take {0 :f3} seconds\n",(double)(end - start) / 1000000);
-        return 0;
     }
 //suppose this is the block erase function,sector size is 4k ,block size is 32k/64k
 //command d8 is block erase command
@@ -699,7 +701,10 @@ public class flash {
 
         Console.Write("SPI configuration set to mode {0:d}, {1:s} shift, " + 
                       "SS[2:0] active low\n", mode, "MSB");
-        Console.Out.Flush();       
+        Console.Out.Flush();
+        // Power off the target using the Cheetah adapter's power supply.
+        CheetahApi.ch_target_power(handle, CheetahApi.CH_TARGET_POWER_OFF);
+        CheetahApi.ch_sleep_ms(100);
 
         // Power the target using the Cheetah adapter's power supply.
         CheetahApi.ch_target_power(handle, CheetahApi.CH_TARGET_POWER_ON);
@@ -751,7 +756,8 @@ public class flash {
             _verify(handle, arg5 * 1024, arg6 * 1024);
             break;
         }
-        
+        // Power off the target using the Cheetah adapter's power supply.
+        CheetahApi.ch_target_power(handle, CheetahApi.CH_TARGET_POWER_OFF);
         // Close the device.
         CheetahApi.ch_close(handle);
         return;
